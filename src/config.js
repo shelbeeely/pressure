@@ -1,25 +1,27 @@
-// This class holds the states of the the Pressure config
-var Config = {
-  // 'false' will make polyfill not run when pressure is not supported and the 'unsupported' method will be called
+// Holds the site-wide default configuration for Pressure.
+export const Config = {
+  // false disables the polyfill; the 'unsupported' callback fires instead.
   polyfill: true,
-  // milliseconds it takes to go from 0 to 1 for the polyfill
+  // milliseconds to ramp from 0 → 1 in polyfill mode.
   polyfillSpeedUp: 1000,
-  // milliseconds it takes to go from 1 to 0 for the polyfill
+  // milliseconds to ramp from 1 → 0 when the press ends in polyfill mode.
   polyfillSpeedDown: 0,
-  // 'true' prevents the selecting of text and images via css properties
+  // true prevents text selection, iOS callout, and force-touch system actions.
   preventSelect: true,
-  // 'touch', 'mouse', or 'pointer' will make it run only on that type of device
+  // 'touch', or 'pointer' constrains Pressure to that event type; null = auto.
   only: null,
-  // this will get the correct config / option settings for the current pressure check
+
+  /** Return the option value, falling back to the global config. */
   get(option, options) {
-    return options.hasOwnProperty(option) ? options[option] : this[option];
+    return Object.prototype.hasOwnProperty.call(options, option) ? options[option] : this[option];
   },
-  // this will set the global configs
+
+  /** Merge options into the global config. */
   set(options) {
-    for (var k in options) {
-      if (options.hasOwnProperty(k) && this.hasOwnProperty(k) && k != 'get' && k != 'set') {
+    for (const k of Object.keys(options)) {
+      if (Object.prototype.hasOwnProperty.call(this, k) && k !== 'get' && k !== 'set') {
         this[k] = options[k];
       }
     }
-  }
-}
+  },
+};

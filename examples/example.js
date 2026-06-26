@@ -1,6 +1,6 @@
 // Example of change method with a failure closure
 // This structure can be used in any methods of Pressure
-// The failure block will return with an "error" and message showing why the device doesn't support 3D Touch and Force Touch
+// The failure block will return with an "error" and message showing why the device doesn't support pressure events
 
 $.pressureConfig({
   polyfill: false
@@ -41,14 +41,14 @@ var block = {
 }
 
 Pressure.set(document.querySelectorAll('#el1'), block);
-Pressure.set(document.querySelectorAll('#el2'), block, {only: 'mouse'});
-Pressure.set($('#el3'), block, {only: 'touch'});
-Pressure.set('#el4', block, {only: 'pointer'});
+Pressure.set(document.querySelectorAll('#el2'), block, {only: 'touch'});
+Pressure.set($('#el3'), block, {only: 'pointer'});
+Pressure.set('#el4', block, {only: 'pointer', polyfill: false});
 
 $('#el1-jquery').pressure(block);
-$('#el2-jquery').pressure(block, {only: 'mouse'});
-$('#el3-jquery').pressure(block, {only: 'touch'});
-$('#el4-jquery').pressure(block, {only: 'pointer'});
+$('#el2-jquery').pressure(block, {only: 'touch'});
+$('#el3-jquery').pressure(block, {only: 'pointer'});
+$('#el4-jquery').pressure(block, {only: 'pointer', polyfill: false});
 
 $('img').pressure({
   change: function(force, event){

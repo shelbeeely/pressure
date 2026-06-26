@@ -321,7 +321,7 @@ Pressure.set('#stuart', {
           </div>
 
           <h4 class="text-light">Device Detection</h4>
-          <p>With Pressure, the third paramater is an optional object of options that can be passed in. The first option is device targeting. Using the "only" keyword, you can define if you want pressure to respond to ONLY touch, ONLY Mouse, or ONLY Pointer events.</p>
+          <p>With Pressure, the third paramater is an optional object of options that can be passed in. The first option is device targeting. Using the "only" keyword, you can define if you want pressure to respond to ONLY touch, ONLY touch, or ONLY pointer events.</p>
           <div class="doc-section">
             <div class="doc-top">
               <div id="element-touch" style="width: 100%;padding: 10px;">Click Me On an iPhone 6s or iPhone 7</div>
@@ -337,14 +337,14 @@ Pressure.set('#stuart', {
 
           <div class="doc-section">
             <div class="doc-top">
-              <div id="element-mouse" style="width: 100%;padding: 10px;">Click Me On a Mac with Force Touch</div>
+              <div id="element-mouse" style="width: 100%;padding: 10px;">Click Me On a Pointer device</div>
             </div>
             <div class="doc-bottom">
               <pre class="language-javascript"><code>Pressure.set('#element-mouse', {
   change: function(force, event){
     this.innerHTML = force + 'on a Mac';
   }
-}, {only: 'mouse'});</code></pre>
+}, {only: 'pointer'});</code></pre>
             </div>
           </div>
 
@@ -380,14 +380,14 @@ Pressure.set('#stuart', {
 
           <div class="doc-section">
             <div class="doc-top">
-              <div id="element-mouse-prevent" style="width: 100%;padding: 10px;">Force touch one of these words on a Force Touch trackpad to define it.</div>
+              <div id="element-mouse-prevent" style="width: 100%;padding: 10px;">Press on one of these words using a pointer-pressure device to define it.</div>
             </div>
             <div class="doc-bottom">
               <pre class="language-javascript"><code>Pressure.set('#element-mouse-prevent', {
   start: function(event){
     console.log('cool it started');
   }
-}, {only: 'mouse', preventSelect: false});</code></pre>
+}, {only: 'pointer', preventSelect: false});</code></pre>
             </div>
           </div>
 

@@ -55,9 +55,9 @@ var block = {
 }
 
 Pressure.set('#el1', block);
-Pressure.set('#el2', block, {only: 'mouse'});
-Pressure.set('#el3', block, {only: 'touch'});
-Pressure.set('#el4', block, {only: 'pointer'});
+Pressure.set('#el2', block, {only: 'touch'});
+Pressure.set('#el3', block, {only: 'pointer'});
+Pressure.set('#el4', block, {only: 'pointer', polyfill: false});
 
 Pressure.set('#pressure-test', {
   start: function(){
@@ -130,9 +130,9 @@ Pressure.set('#element-touch', {
 
 Pressure.set('#element-mouse', {
   change: function(force, event){
-    this.innerHTML = force + 'on a Mac';
+    this.innerHTML = force + ' on a pointer device';
   }
-}, {only: 'mouse', polyfill: false});
+}, {only: 'pointer', polyfill: false});
 
 Pressure.set('#element-pointer', {
   change: function(force, event){
@@ -140,9 +140,9 @@ Pressure.set('#element-pointer', {
   }
 }, {only: 'pointer', polyfill: false});
 
-Pressure.set('#element-touch-prevent', {}, {only: 'touch', preventDefault: false});
+Pressure.set('#element-touch-prevent', {}, {only: 'touch', preventSelect: false});
 
-Pressure.set('#element-mouse-prevent', {}, {only: 'mouse', preventDefault: false});
+Pressure.set('#element-mouse-prevent', {}, {only: 'pointer', preventSelect: false});
 
 Pressure.set('#polyfill-example', {
   change: function(force, event){
