@@ -1,7 +1,11 @@
-/*
-This is the base adapter from which all the other adapters extend.
-*/
-class Adapter {
+import { Config } from '../config.js';
+import { map } from '../utils.js';
+
+/**
+ * Base adapter – all device-specific adapters extend this class.
+ * It owns the polyfill loop and the shared press-state machine.
+ */
+export class Adapter {
   constructor(el, block, options) {
     this.el = el;
     this.block = block;
@@ -13,36 +17,24 @@ class Adapter {
     this.runKey = Math.random();
   }
 
-  setPressed(boolean) {
-    this.pressed = boolean;
+  setPressed(value)     { this.pressed = value; }
+  setDeepPressed(value) { this.deepPressed = value; }
+  isPressed()           { return this.pressed; }
+  isDeepPressed()       { return this.deepPressed; }
+
+  add(event, handler) {
+    this.el.addEventListener(event, handler, false);
   }
 
-  setDeepPressed(boolean) {
-    this.deepPressed = boolean;
-  }
-
-  isPressed() {
-    return this.pressed;
-  }
-
-  isDeepPressed() {
-    return this.deepPressed;
-  }
-
-  add(event, set) {
-    this.el.addEventListener(event, set, false);
-  }
-
-  runClosure(method) {
-    if(method in this.block) {
-      // call the closure method and apply nth arguments if they exist
-      this.block[method].apply(this.el, Array.prototype.slice.call(arguments, 1));
+  runClosure(method, ...args) {
+    if (method in this.block) {
+      this.block[method].apply(this.el, args);
     }
   }
 
   fail(event, runKey) {
-    if(Config.get('polyfill', this.options)) {
-      if(this.runKey === runKey) {
+    if (Config.get('polyfill', this.options)) {
+      if (this.runKey === runKey) {
         this.runPolyfill(event);
       }
     } else {
@@ -51,11 +43,11 @@ class Adapter {
   }
 
   bindUnsupportedEvent() {
-    this.add(supportsTouch ? 'touchstart' : 'mousedown', (event) => this.runClosure('unsupported', event));
+    this.add('touchstart', (event) => this.runClosure('unsupported', event));
   }
 
   _startPress(event) {
-    if(this.isPressed() === false) {
+    if (!this.isPressed()) {
       this.runningPolyfill = false;
       this.setPressed(true);
       this.runClosure('start', event);
@@ -63,7 +55,7 @@ class Adapter {
   }
 
   _startDeepPress(event) {
-    if(this.isPressed() && this.isDeepPressed() === false) {
+    if (this.isPressed() && !this.isDeepPressed()) {
       this.setDeepPressed(true);
       this.runClosure('startDeepPress', event);
     }
@@ -75,15 +67,15 @@ class Adapter {
   }
 
   _endDeepPress() {
-    if(this.isPressed() && this.isDeepPressed()) {
+    if (this.isPressed() && this.isDeepPressed()) {
       this.setDeepPressed(false);
       this.runClosure('endDeepPress');
     }
   }
 
   _endPress() {
-    if(this.runningPolyfill === false){
-      if(this.isPressed()){
+    if (!this.runningPolyfill) {
+      if (this.isPressed()) {
         this._endDeepPress();
         this.setPressed(false);
         this.runClosure('end');
@@ -100,39 +92,44 @@ class Adapter {
   }
 
   runPolyfill(event) {
-    this.increment = Config.get('polyfillSpeedUp', this.options) === 0 ? 1 : 10 / Config.get('polyfillSpeedUp', this.options);
-    this.decrement = Config.get('polyfillSpeedDown', this.options) === 0 ? 1 : 10 / Config.get('polyfillSpeedDown', this.options);
+    const speedUp   = Config.get('polyfillSpeedUp',   this.options);
+    const speedDown = Config.get('polyfillSpeedDown', this.options);
+    this.increment = speedUp   === 0 ? 1 : 10 / speedUp;
+    this.decrement = speedDown === 0 ? 1 : 10 / speedDown;
     this.setPressed(true);
     this.runClosure('start', event);
-    if(this.runningPolyfill === false) {
+    if (!this.runningPolyfill) {
       this.loopPolyfillForce(0, event);
     }
   }
 
   loopPolyfillForce(force, event) {
-    if(this.nativeSupport === false){
-      if(this.isPressed()) {
-        this.runningPolyfill = true;
-        force = force + this.increment > 1 ? 1 : force + this.increment;
+    if (this.nativeSupport) return;
+
+    if (this.isPressed()) {
+      this.runningPolyfill = true;
+      force = force + this.increment > 1 ? 1 : force + this.increment;
+      this.runClosure('change', force, event);
+      this.deepPress(force, event);
+      setTimeout(() => this.loopPolyfillForce(force, event), 10);
+    } else {
+      force = force - this.decrement < 0 ? 0 : force - this.decrement;
+      if (force < 0.5 && this.isDeepPressed()) {
+        this.setDeepPressed(false);
+        this.runClosure('endDeepPress');
+      }
+      if (force === 0) {
+        this.runningPolyfill = false;
+        this.setPressed(true);
+        this._endPress();
+      } else {
         this.runClosure('change', force, event);
         this.deepPress(force, event);
-        setTimeout(this.loopPolyfillForce.bind(this, force, event), 10);
-      } else {
-        force = force - this.decrement < 0 ? 0 : force - this.decrement;
-        if(force < 0.5 && this.isDeepPressed()) {
-          this.setDeepPressed(false);
-          this.runClosure('endDeepPress');
-        }
-        if(force === 0) {
-          this.runningPolyfill = false;
-          this.setPressed(true);
-          this._endPress();
-        } else {
-          this.runClosure('change', force, event);
-          this.deepPress(force, event);
-          setTimeout(this.loopPolyfillForce.bind(this, force, event), 10);
-        }
+        setTimeout(() => this.loopPolyfillForce(force, event), 10);
       }
     }
   }
+
+  // Expose map() for subclasses.
+  static map(...args) { return map(...args); }
 }

@@ -1,47 +1,58 @@
 {
   "name": "pressure",
   "version": "2.2.0",
-  "description": "Pressure is a lightweight JavaScript library for Force Touch, 3D Touch, and Pointer Pressure through a single API.",
-  "main": "dist/pressure.min.js",
+  "description": "Pressure is a lightweight JavaScript library for Pointer Pressure, 3D Touch, and Force Touch through a single API.",
+  "type": "module",
+  "main": "dist/pressure.cjs",
+  "module": "dist/pressure.js",
+  "types": "dist/pressure.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/pressure.js",
+      "require": "./dist/pressure.cjs"
+    },
+    "./jquery": {
+      "import": "./dist/jquery.pressure.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "sideEffects": false,
   "dependencies": {},
   "devDependencies": {
-    "@babel/core": "^7.11.6",
-    "@babel/preset-env": "^7.11.5",
-    "gulp": "^4.0.2",
-    "gulp-babel": "^8.0.0",
-    "gulp-concat": "^2.6.1",
-    "gulp-inject-string": "^1.1.2",
-    "gulp-rename": "^2.0.0",
-    "gulp-uglify": "^3.0.2",
-    "gulp-umd": "^2.0.0"
+    "@eslint/js": "^10.0.1",
+    "@rollup/plugin-terser": "^1.0.0",
+    "eslint": "^10.5.0",
+    "jsdom": "^29.1.1",
+    "rollup": "^4.62.2",
+    "vitest": "^4.1.9"
   },
   "scripts": {
-    "dist": "gulp dist",
-    "watch": "gulp watch",
-    "prepublish": "npm run dist"
+    "build": "rollup -c && cp src/pressure.d.ts dist/pressure.d.ts",
+    "prepare": "npm run build",
+    "lint": "eslint src",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/stuyam/pressure.git"
+    "url": "git+https://github.com/shelbeeely/pressure.git"
   },
   "keywords": [
-    "forcetouch",
-    "force-touch",
-    "3dtouch",
-    "3d-touch",
     "pressure",
     "pressurejs",
-    "iphone6s",
-    "iphone6splus",
-    "iphone7",
-    "iphone7plus",
-    "magic-trackpad",
-    "apple-pencil"
+    "pointer-pressure",
+    "force-touch",
+    "3d-touch",
+    "apple-pencil",
+    "stylus"
   ],
   "author": "Stuart Yamartino",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/stuyam/pressure/issues"
+    "url": "https://github.com/shelbeeely/pressure/issues"
   },
-  "homepage": "https://github.com/stuyam/pressure#readme"
+  "homepage": "https://github.com/shelbeeely/pressure#readme"
 }

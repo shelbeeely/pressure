@@ -1,20 +1,38 @@
-//--------------------- Public API Section ---------------------//
-// this is the Pressure Object, this is the only object that is accessible to the end user
-// only the methods in this object can be called, making it the "public api"
-var Pressure = {
-  // targets any device with Force or 3D Touch
+import { Config } from './config.js';
+import { map, isElement } from './utils.js';
+import { PressureElement } from './element.js';
+
+function loopPressureElements(selector, closure, options = {}) {
+  if (typeof selector === 'string' || selector instanceof String) {
+    document.querySelectorAll(selector).forEach(el => new PressureElement(el, closure, options));
+  } else if (isElement(selector)) {
+    new PressureElement(selector, closure, options);
+  } else {
+    // Node list, jQuery object, or any array-like.
+    Array.from(selector).forEach(el => new PressureElement(el, closure, options));
+  }
+}
+
+//--------------------- Public API ---------------------//
+const Pressure = {
+  /** Attach pressure listeners to one or more elements. */
   set(selector, closure, options) {
     loopPressureElements(selector, closure, options);
   },
 
-  // set configuration options for global config
+  /** Set site-wide default options. */
   config(options) {
     Config.set(options);
   },
 
-  // the map method allows for interpolating a value from one range of values to another
-  // example from the Arduino documentation: https://www.arduino.cc/en/Reference/Map
-  map(x, in_min, in_max, out_min, out_max) {
-    return map.apply(null, arguments);
-  }
-}
+  /**
+   * Map a value from one numeric range to another.
+   * @example Pressure.map(force, 0, 1, 100, 200) → pixels
+   */
+  map(x, inMin, inMax, outMin, outMax) {
+    return map(x, inMin, inMax, outMin, outMax);
+  },
+};
+
+export { Pressure };
+export default Pressure;
