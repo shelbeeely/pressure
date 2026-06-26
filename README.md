@@ -89,7 +89,7 @@ Pressure.config({
   polyfill: true,
   polyfillSpeedUp: 1000,
   polyfillSpeedDown: 0,
-  preventDefault: true,
+  preventSelect: true,
   only: null,
 });
 ```
