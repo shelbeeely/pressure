@@ -16,8 +16,11 @@ export class AdapterPointer extends Adapter {
 
   support(event) {
     if (!this.isPressed()) {
-      // pressure 0, 0.5, or >1 indicates no native pressure support.
-      if (event.pressure === 0 || event.pressure === 0.5 || event.pressure > 1) {
+      // Touch pointers (finger) never carry real hardware pressure — only pen/stylus
+      // pointers do. We also reject the spec-mandated placeholder values (0 and 0.5)
+      // and anything > 1 that browsers sometimes emit.
+      if (event.pointerType === 'touch' ||
+          event.pressure === 0 || event.pressure === 0.5 || event.pressure > 1) {
         this.fail(event, this.runKey);
       } else {
         this._startPress(event);
@@ -27,7 +30,8 @@ export class AdapterPointer extends Adapter {
   }
 
   change(event) {
-    if (this.isPressed() && event.pressure > 0 && event.pressure !== 0.5) {
+    if (this.isPressed() && event.pointerType !== 'touch' &&
+        event.pressure > 0 && event.pressure !== 0.5) {
       this._changePress(event.pressure, event);
       this.deepPress(event.pressure, event);
     }
